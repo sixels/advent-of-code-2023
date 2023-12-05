@@ -74,5 +74,3 @@ fn try_match_digit(value: char, rest: &str) -> Option<u32> {
 fn to_ascii_digit(c: char) -> u32 {
     (c as u32).saturating_sub(48)
 }
-
-// fn is_digit(c: )
