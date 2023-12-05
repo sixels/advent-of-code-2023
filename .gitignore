@@ -1,11 +1,6 @@
 .env
 
-/obj/
-/bin/
-/alire/
-/config/
-
-./inputs/day*
+/inputs/day*
 
 # Added by cargo
 
