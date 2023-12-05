@@ -1,17 +1,10 @@
 use super::{Input, Solution};
 
-pub struct Day1 {
-    input: Input,
-}
+pub struct Day1;
 
 impl Solution<1> for Day1 {
-    fn new(input: Input) -> Self {
-        Self { input }
-    }
-
-    fn solve_part_one(&self) {
-        let solution: u32 = self
-            .input
+    fn solve_part_one(&self, input: &Input) {
+        let solution: u32 = input
             .lines()
             .map(|line| {
                 let left = line
@@ -35,9 +28,8 @@ impl Solution<1> for Day1 {
         println!("{solution}")
     }
 
-    fn solve_part_two(&self) {
-        let solution: u32 = self
-            .input
+    fn solve_part_two(&self, input: &Input) {
+        let solution: u32 = input
             .lines()
             .map(|line| {
                 let left = line

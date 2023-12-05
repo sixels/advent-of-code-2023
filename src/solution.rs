@@ -1,12 +1,11 @@
-pub mod day1;
+pub mod day01;
+pub mod day02;
 
 use std::{fs, path::Path};
 
 pub trait Solution<const DAY: usize> {
-    fn new(input: Input) -> Self;
-
-    fn solve_part_one(&self);
-    fn solve_part_two(&self);
+    fn solve_part_one(&self, input: &Input);
+    fn solve_part_two(&self, input: &Input);
 }
 
 pub struct Input {

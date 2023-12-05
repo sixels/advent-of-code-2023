@@ -1,6 +1,6 @@
 use std::env;
 
-use aoc2023::solution::{day1::Day1, Input, Solution};
+use aoc2023::solution::{day02::Day2, Input, Solution};
 
 fn main() {
     let input_path = env::args()
@@ -8,7 +8,5 @@ fn main() {
         .expect("You should pass the input file path as argument");
     let input = Input::read(input_path).unwrap();
 
-    let day_one = Day1::new(input);
-
-    day_one.solve_part_two();
+    Day2.solve_part_one(&input);
 }
