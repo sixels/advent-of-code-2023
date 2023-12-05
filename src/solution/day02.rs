@@ -20,7 +20,26 @@ impl Solution<2> for Day2 {
     }
 
     fn solve_part_two(&self, input: &Input) {
-        todo!()
+        let solution = input
+            .lines()
+            .filter(|line| !line.is_empty())
+            .map(Game::parse_line)
+            .map(|game| {
+                let max_cubes = game
+                    .sets
+                    .iter()
+                    .copied()
+                    .fold(Cubes::default(), |acc, set| Cubes {
+                        red: acc.red.max(set.red),
+                        green: acc.green.max(set.green),
+                        blue: acc.blue.max(set.blue),
+                    });
+
+                max_cubes.red * max_cubes.green * max_cubes.blue
+            })
+            .sum::<usize>();
+
+        println!("{solution}")
     }
 }
 

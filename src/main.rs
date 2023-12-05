@@ -8,5 +8,5 @@ fn main() {
         .expect("You should pass the input file path as argument");
     let input = Input::read(input_path).unwrap();
 
-    Day2.solve_part_one(&input);
+    Day2.solve_part_two(&input);
 }
