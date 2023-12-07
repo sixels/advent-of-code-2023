@@ -7,15 +7,15 @@ pub struct Day3;
 const LOOKUP: [(isize, isize); 8] = [
     // top
     (-1, -1),
-    (-1, 0),
-    (-1, 1),
-    // left/right
     (0, -1),
-    (0, 1),
-    // bottom
     (1, -1),
+    // left/right
+    (-1, 0),
     (1, 0),
+    // bottom
+    (0, 1),
     (1, 1),
+    (-1, 1),
 ];
 
 impl Solution<3> for Day3 {
@@ -66,7 +66,61 @@ impl Solution<3> for Day3 {
     }
 
     fn solve_part_two(&self, input: &Input) {
-        todo!()
+        let grid = Grid::new(&input.content);
+
+        let gears = grid.lines.iter().enumerate().flat_map(|(y, line)| {
+            line.char_indices()
+                .filter_map(|(x, c)| (c == '*').then_some((x, y)))
+                .collect::<Vec<_>>()
+        });
+
+        let solution: u32 = gears
+            .fold(HashMap::new(), |acc: HashMap<_, _>, (sym_x, sym_y)| {
+                LOOKUP
+                    .iter()
+                    .filter_map(|&(dx, dy)| {
+                        let Some(x) = sym_x.checked_add_signed(dx) else {
+                            return None;
+                        };
+                        let Some(y) = sym_y.checked_add_signed(dy) else {
+                            return None;
+                        };
+
+                        if y >= grid.lines.len() || x >= grid.lines[y].len() {
+                            return None;
+                        }
+
+                        grid.lines
+                            .get(y)
+                            .map(|line| (line.chars().nth(x).unwrap(), (x, y)))
+                    })
+                    .fold(acc, |mut acc, (ch, (x, y))| {
+                        if !ch.is_ascii_digit() {
+                            return acc;
+                        }
+
+                        let number = get_number(&grid.lines[y], x);
+
+                        if acc
+                            .get(&(sym_x, sym_y))
+                            .map(|(_, a, b)| *a == number || *b == number)
+                            .unwrap_or(false)
+                        {
+                            return acc;
+                        }
+
+                        let gear = acc.entry((sym_x, sym_y)).or_insert((0, number, (0, 0)));
+
+                        gear.0 += 1;
+                        gear.2 = number;
+
+                        acc
+                    })
+            })
+            .iter()
+            .filter_map(|(_, (count, a, b))| if *count == 2 { Some(a.1 * b.1) } else { None })
+            .sum();
+        println!("{solution}")
     }
 }
 
