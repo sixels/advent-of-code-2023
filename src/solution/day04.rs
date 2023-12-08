@@ -5,6 +5,8 @@ use nom::{
     IResult,
 };
 
+use crate::parse::take_number;
+
 use super::Solution;
 
 pub struct Day4;
@@ -73,10 +75,6 @@ pub struct Card {
 }
 impl Card {
     pub fn parse_line(input: &str) -> IResult<&str, Self> {
-        fn take_number(input: &str) -> IResult<&str, &str> {
-            take_while1(|c: char| c.is_ascii_digit())(input)
-        }
-
         // Card N
         let input = &input[4..];
         let (input, _) = take_while1(|c: char| c == ' ')(input)?;
@@ -88,12 +86,12 @@ impl Card {
         let (input, winning_input) = take_until("|")(input)?;
         let winning = winning_input
             .split(' ')
-            .filter_map(|num| take_number(num).ok().map(|(_, s)| s.parse().unwrap()))
+            .filter_map(|num| take_number(num).ok().map(|(_, n)| n))
             .collect();
 
         let have = input
             .split(' ')
-            .filter_map(|num| take_number(num).ok().map(|(_, s)| s.parse().unwrap()))
+            .filter_map(|num| take_number(num).ok().map(|(_, n)| n))
             .collect();
 
         let number = number_str.parse().unwrap();

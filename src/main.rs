@@ -1,6 +1,8 @@
 use std::env;
 
-use aoc2023::solution::{day01::Day1, day02::Day2, day03::Day3, day04::Day4, Input, Solution};
+use aoc2023::solution::{
+    day01::Day1, day02::Day2, day03::Day3, day04::Day4, day05::Day5, Input, Solution,
+};
 
 fn main() {
     let days: Vec<Box<dyn Solution>> = vec![
@@ -8,6 +10,7 @@ fn main() {
         Box::new(Day2),
         Box::new(Day3),
         Box::new(Day4),
+        Box::new(Day5),
     ];
 
     let day_option = env::args()
