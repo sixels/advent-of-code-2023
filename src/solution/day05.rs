@@ -1,3 +1,5 @@
+use std::iter;
+
 use nom::{
     branch::alt,
     bytes::complete::{tag, take, take_till, take_until, take_until1},
@@ -6,6 +8,7 @@ use nom::{
     sequence::pair,
     AsBytes, IResult,
 };
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 use crate::parse::take_number;
 
@@ -28,7 +31,27 @@ impl Solution for Day5 {
         println!("{solution}");
     }
     fn solve_part_two(&self, input: &Input) {
-        todo!("part two")
+        use rayon::prelude::*;
+        let (_, almanac) =
+            Almanac::try_parse(std::str::from_utf8(input.content.as_bytes()).unwrap()).unwrap();
+
+        let almanac_ref = &almanac;
+        let solution = almanac
+            .seeds
+            .chunks_exact(2)
+            .map(|seed_range| {
+                let (start, range) = (seed_range[0], seed_range[1]);
+                iter::successors(Some(start), |n| n.checked_add(1))
+                    .take(range)
+                    .par_bridge()
+                    .map(|seed| almanac_ref.find_location(seed))
+                    .min()
+                    .unwrap_or(usize::MAX)
+            })
+            .min()
+            .unwrap_or(0);
+
+        println!("{solution}");
     }
 }
 
@@ -133,8 +156,8 @@ impl AlmanacMap {
 }
 
 fn find_mapped_number(maps: &[AlmanacMap], number: usize) -> usize {
-    maps.iter()
-        .find_map(|map| {
+    maps.par_iter()
+        .find_map_any(|map| {
             if number >= map.source && number < (map.source + map.range) {
                 Some(number - map.source + map.destination)
             } else {
