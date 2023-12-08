@@ -1,3 +1,5 @@
+use std::{collections::BTreeMap, iter};
+
 use nom::{
     bytes::complete::{take_until, take_while1},
     IResult,
@@ -32,7 +34,34 @@ impl Solution for Day4 {
     }
 
     fn solve_part_two(&self, input: &super::Input) {
-        todo!()
+        let solution: u32 = input
+            .lines()
+            .filter(|line| !line.is_empty())
+            .map(|line| Card::parse_line(line).unwrap().1)
+            .map(|card| {
+                let matches = card
+                    .winning
+                    .iter()
+                    .filter(|a| card.have.contains(*a))
+                    .count();
+                matches
+            })
+            .enumerate()
+            .fold(BTreeMap::new(), |mut acc, (i, matches)| {
+                let count = acc.entry(i).or_insert(1);
+                iter::repeat(*count)
+                    .take(matches)
+                    .enumerate()
+                    .fold(acc, |mut acc, (j, n)| {
+                        let next = acc.entry(i + j + 1).or_insert(1);
+                        *next += n;
+                        acc
+                    })
+            })
+            .into_values()
+            .sum();
+
+        println!("{solution}");
     }
 }
 
