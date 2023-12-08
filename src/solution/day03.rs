@@ -18,7 +18,7 @@ const LOOKUP: [(isize, isize); 8] = [
     (-1, 1),
 ];
 
-impl Solution<3> for Day3 {
+impl Solution for Day3 {
     fn solve_part_one(&self, input: &Input) {
         let grid = Grid::new(&input.content);
 

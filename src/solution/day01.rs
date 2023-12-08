@@ -2,7 +2,7 @@ use super::{Input, Solution};
 
 pub struct Day1;
 
-impl Solution<1> for Day1 {
+impl Solution for Day1 {
     fn solve_part_one(&self, input: &Input) {
         let solution: u32 = input
             .lines()

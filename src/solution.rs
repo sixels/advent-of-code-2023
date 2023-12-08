@@ -1,16 +1,13 @@
 pub mod day01;
 pub mod day02;
 pub mod day03;
+pub mod day04;
 
 use std::{fs, path::Path};
 
-pub trait Solution<const DAY: usize> {
+pub trait Solution {
     fn solve_part_one(&self, input: &Input);
     fn solve_part_two(&self, input: &Input);
-
-    fn day_number(&self) -> usize {
-        DAY
-    }
 }
 
 pub struct Input {
@@ -25,9 +22,9 @@ impl Input {
         Ok(Self { content })
     }
 
-    pub fn lines(&self) -> impl Iterator<Item = String> + '_ {
+    pub fn lines(&self) -> impl Iterator<Item = &str> + '_ {
         self.content
             .split(|byte| *byte == 0x0a)
-            .map(|slice| String::from_utf8_lossy(slice).into_owned())
+            .map(|slice| std::str::from_utf8(slice).unwrap())
     }
 }

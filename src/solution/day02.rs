@@ -2,7 +2,7 @@ use super::{Input, Solution};
 
 pub struct Day2;
 
-impl Solution<2> for Day2 {
+impl Solution for Day2 {
     fn solve_part_one(&self, input: &Input) {
         let solution = input
             .lines()
@@ -56,7 +56,7 @@ struct Game {
 }
 
 impl Game {
-    pub fn parse_line(line: String) -> Self {
+    pub fn parse_line(line: &str) -> Self {
         let game_str = line.split(':').collect::<Vec<_>>();
         let id = {
             let id_str = game_str[0]
