@@ -8,7 +8,6 @@ use nom::{
     sequence::pair,
     AsBytes, IResult,
 };
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 use crate::parse::take_number;
 
@@ -24,27 +23,25 @@ impl Solution for Day5 {
         let solution = almanac
             .seeds
             .iter()
-            .map(|seed| almanac.find_location(*seed))
+            .map(|seed| find_location(&almanac.mappings, *seed))
             .min()
             .unwrap_or(0);
 
         println!("{solution}");
     }
     fn solve_part_two(&self, input: &Input) {
-        use rayon::prelude::*;
         let (_, almanac) =
             Almanac::try_parse(std::str::from_utf8(input.content.as_bytes()).unwrap()).unwrap();
 
-        let almanac_ref = &almanac;
-        let solution = almanac
-            .seeds
+        let Almanac { seeds, mappings } = almanac;
+
+        let solution = seeds
             .chunks_exact(2)
             .map(|seed_range| {
                 let (start, range) = (seed_range[0], seed_range[1]);
                 iter::successors(Some(start), |n| n.checked_add(1))
                     .take(range)
-                    .par_bridge()
-                    .map(|seed| almanac_ref.find_location(seed))
+                    .map(|seed| find_location(&mappings, seed))
                     .min()
                     .unwrap_or(usize::MAX)
             })
@@ -59,13 +56,7 @@ impl Solution for Day5 {
 struct Almanac {
     seeds: Vec<usize>,
 
-    seed_soil: Vec<AlmanacMap>,
-    soil_fertilizer: Vec<AlmanacMap>,
-    fertilizer_water: Vec<AlmanacMap>,
-    water_light: Vec<AlmanacMap>,
-    light_temperature: Vec<AlmanacMap>,
-    temperature_humidity: Vec<AlmanacMap>,
-    humidity_location: Vec<AlmanacMap>,
+    mappings: Vec<Vec<AlmanacMap>>,
 }
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -95,43 +86,13 @@ impl Almanac {
             Ok((input, (section_name, maps)))
         })(input)?;
 
-        let almanac = maps.into_iter().fold(
+        Ok((
+            input,
             Self {
                 seeds,
-                ..Default::default()
+                mappings: maps.into_iter().map(|(_, m)| m).collect(),
             },
-            |mut a, (name, maps)| {
-                match name {
-                    "seed-to-soil" => a.seed_soil = maps,
-                    "soil-to-fertilizer" => a.soil_fertilizer = maps,
-                    "fertilizer-to-water" => a.fertilizer_water = maps,
-                    "water-to-light" => a.water_light = maps,
-                    "light-to-temperature" => a.light_temperature = maps,
-                    "temperature-to-humidity" => a.temperature_humidity = maps,
-                    "humidity-to-location" => a.humidity_location = maps,
-                    _ => panic!("{name} is not valid"),
-                };
-                a
-            },
-        );
-
-        Ok((input, almanac))
-    }
-
-    fn find_location(&self, seed: usize) -> usize {
-        let sequence = [
-            &self.seed_soil,
-            &self.soil_fertilizer,
-            &self.fertilizer_water,
-            &self.water_light,
-            &self.light_temperature,
-            &self.temperature_humidity,
-            &self.humidity_location,
-        ];
-
-        sequence
-            .into_iter()
-            .fold(seed, |number, maps| find_mapped_number(maps, number))
+        ))
     }
 }
 
@@ -155,14 +116,16 @@ impl AlmanacMap {
     }
 }
 
-fn find_mapped_number(maps: &[AlmanacMap], number: usize) -> usize {
-    maps.par_iter()
-        .find_map_any(|map| {
-            if number >= map.source && number < (map.source + map.range) {
-                Some(number - map.source + map.destination)
-            } else {
-                None
-            }
-        })
-        .unwrap_or(number)
+fn find_location(mappings: &[Vec<AlmanacMap>], seed: usize) -> usize {
+    mappings.iter().fold(seed, |number, maps| {
+        maps.iter()
+            .find_map(|map| {
+                if number >= map.source && number < (map.source + map.range) {
+                    Some(number - map.source + map.destination)
+                } else {
+                    None
+                }
+            })
+            .unwrap_or(number)
+    })
 }
