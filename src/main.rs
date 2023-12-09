@@ -1,7 +1,8 @@
 use std::env;
 
 use aoc2023::solution::{
-    day01::Day1, day02::Day2, day03::Day3, day04::Day4, day05::Day5, day06::Day6, Input, Solution,
+    day01::Day1, day02::Day2, day03::Day3, day04::Day4, day05::Day5, day06::Day6, day07::Day7,
+    Input, Solution,
 };
 
 fn main() {
@@ -12,6 +13,7 @@ fn main() {
         Box::new(Day4),
         Box::new(Day5),
         Box::new(Day6),
+        Box::new(Day7),
     ];
 
     let day_option = env::args()
